@@ -60,9 +60,10 @@ y_b0 = c_y_b(2);
 % this is using the formula that was given to cal time when they are close 
 
 % this will be getting the numerator and demoninator first 
-n = (x_b0-x_a0) * (u_b-u_a) + (y_b0-y_a0) * (v_b- v_a);
+% does this n need to be negative 
+n = -((x_b0-x_a0) * (u_b-u_a) + (y_b0-y_a0) * (v_b- v_a));
 d = (u_b-u_a)^2 + (v_b- v_a)^2; 
-T_ca = -n / d; 
+T_ca = n / d; 
 
 %% min distance at T of the closet approach 
 
@@ -77,6 +78,35 @@ y_b_Tca = y_b0 + v_b * T_ca;
 D_min = sqrt((x_b_Tca - x_a_Tca)^2 + (y_b_Tca-y_a_Tca)^2);
 
 %% Error prop 
+
+% define uncertianites 
+s_x_a = 0.1;
+s_y_a = 0.1;
+s_x_b = 0.1;
+s_y_b = 0.1;
+
+%error prop for T_ca
+% these are the partial dervis 
+dt_ca_dxa0 = -(u_b-u_a)/d;
+dt_ca_dya0 = -(v_b-v_a)/d;
+dt_ca_dxb0 = (u_b-u_a)/d;
+dt_ca_dyb0 = (v_b-v_a)/d;
+
+%uncertainty of tca 
+s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2);
+
+
+%Error prop of dmin 
+%this will also be with partial dervis 
+dD_minx = -(x_b_Tca-x_a_Tca)/D_min;
+dD_miny = -(y_b_Tca-y_a_Tca)/D_min;
+
+%this is the uncertiany for dmin 
+s_D_min = sqrt((dD_minx*s_x_a)^2+ (dD_miny*s_y_a)^2 + (dD_minx*s_x_b)^2 + (dD_miny*s_y_b)^2 );
+
+%display the uncertaintie 
+fprintf('T_ca: %.2f +/- %.2f second\n', T_ca, s_Tca);
+fprintf('D_min: %.2f +/- %.2f Km\n', D_min, s_D_min);
 
 
 %% descion making and warning 
@@ -105,11 +135,18 @@ fprintf( 'warning code: %s\n', warning_code);
 
 figure; 
 hold on; 
-plot(x_a, y_a);
-plot(x_b, y_b);
-plot([x_a0,x_a_Tca], [y_a0, y_a_Tca]);
-plot([x_b0,x_b_Tca], [y_b0, y_b_Tca]);
-plot(x_a_Tca, y_a_Tca);
+plot(x_a, y_a,'-o','DisplayName','ISS A tajectory');
+plot(x_b, y_b,'-o','DisplayName','ISS B trajectory');
+plot([x_a0,x_a_Tca], [y_a0, y_a_Tca], '--', 'DisplayName','ISS A Path');
+plot([x_b0,x_b_Tca], [y_b0, y_b_Tca], '--', 'DisplayName','ISS B Path');
+plot(x_a_Tca, y_a_Tca,'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Appraoch');
+plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Appraoch');
 grid on; 
+
+
+xlabel('X Position (km)');
+ylabel('Y Position (km)');
+title('Trajectory of ISS A and ISS B');
+legend('Location','best');
 hold off; 
 
