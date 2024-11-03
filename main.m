@@ -1,10 +1,10 @@
 %{
-Author: 
-Assignment:
-Creation Date: 
-Inputs:
-Outputs: 
-Purpose: 
+Authors: Nevaeh Montoya, Rhiannon Rapplean
+Assignment: Project 1 ISS
+Creation Date: 10/23/2024
+Inputs: Location data (2 sets)
+Outputs: Time of closest approach, distance, recommended proximity warnings
+Purpose: Analyze risk of two orbital bodies colliding
 %}
 
 clear;
@@ -15,9 +15,17 @@ close all;
 
 % this is going to load with the names 
 % here im using variblenamerule and setting it to preserve 
-%this makes it read colum headers i think 
+%this makes it read colum headers i think
 data_ISS_A = readtable('Data_ISS_A.csv', 'VariableNamingRule','preserve');
 data_ISS_B = readtable('Data_ISS_B.csv','VariableNamingRule','preserve');
+
+%{
+RR - Preserving variable names makes the program give the variables names
+ it may not be able to read, then below you set the variable names to
+ something both the program and we can read. The original var names
+ would've been fine; warnings are not errors and do not have to be dealt
+ with, but I do like these ones more.
+%}
 
 %i think this giving varible names 
 data_ISS_A.Properties.VariableNames = {'Time_s','X_km', 'Y_km'};
@@ -25,8 +33,9 @@ data_ISS_B.Properties.VariableNames = {'Time_s','X_km', 'Y_km'};
 
 %adjust?? 
 %im not sure if this is right 
+%RR - looks fine to me
 
-%this is taking the column into sperate varibles 
+%this is taking the columns into sperate varibles 
 time_a = data_ISS_A.Time_s;
 x_a = data_ISS_A.X_km;
 y_a = data_ISS_A.Y_km;
@@ -40,7 +49,10 @@ y_b = data_ISS_B.Y_km;
 % makes y = mx +b 
 
 %linear model for x and y over time so we can get the velocity for both 
-%lin fit for A 
+%lin fit for A
+%RR - I have a few questions about the equation we were given; you assign
+%x_a0 and such with poly coeffs here, but I though they were supposed to be
+%initial coordinates
 c_x_a = polyfit(time_a, x_a, 1);
 c_y_a = polyfit(time_a, y_a, 1);
 u_a = c_x_a(1); 
@@ -60,7 +72,8 @@ y_b0 = c_y_b(2);
 % this is using the formula that was given to cal time when they are close 
 
 % this will be getting the numerator and demoninator first 
-% does this n need to be negative 
+% does this n need to be negative
+% RR - I can't see a reason n should be negative; why do you ask?
 n = -((x_b0-x_a0) * (u_b-u_a) + (y_b0-y_a0) * (v_b- v_a));
 d = (u_b-u_a)^2 + (v_b- v_a)^2; 
 T_ca = n / d; 
@@ -86,7 +99,10 @@ s_x_b = 0.1;
 s_y_b = 0.1;
 
 %error prop for T_ca
-% these are the partial dervis 
+% these are the partial dervis
+%RR - there are 4 partial derivatives here and we need 8; I believe the
+%ones missing are u_B, u_A, v_B, and v_A
+%I'll start looking into that when I wake up
 dt_ca_dxa0 = -(u_b-u_a)/d;
 dt_ca_dya0 = -(v_b-v_a)/d;
 dt_ca_dxb0 = (u_b-u_a)/d;
