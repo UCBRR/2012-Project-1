@@ -73,7 +73,7 @@ y_b_Tca = y_b0 + v_b * T_ca;
 % this is getting min distance 
 D_min = sqrt((x_b_Tca - x_a_Tca)^2 + (y_b_Tca-y_a_Tca)^2);
 
-%% Error prop 
+%% Error propagation 
 
 %Calculating the standard deviation from our best fit to find uncertainty
 %Calculating velocity residuals
