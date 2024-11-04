@@ -50,9 +50,7 @@ y_b = data_ISS_B.Y_km;
 
 %linear model for x and y over time so we can get the velocity for both 
 %lin fit for A
-%RR - I have a few questions about the equation we were given; you assign
-%x_a0 and such with poly coeffs here, but I though they were supposed to be
-%initial coordinates
+%RR - This makes sense actually
 c_x_a = polyfit(time_a, x_a, 1);
 c_y_a = polyfit(time_a, y_a, 1);
 u_a = c_x_a(1); 
@@ -92,16 +90,33 @@ D_min = sqrt((x_b_Tca - x_a_Tca)^2 + (y_b_Tca-y_a_Tca)^2);
 
 %% Error prop 
 
-% define uncertianites 
-%RR - where'd these come from? Are there ones for the velocities?
-s_x_a = 0.1;
-s_y_a = 0.1;
-s_u_a = 0.1;
-s_v_a = 0.1;
-s_x_b = 0.1;
-s_y_b = 0.1;
-s_u_b = 0.1;
-s_v_b = 0.1;
+%Calculating the standard deviation from our best fit to find uncertainty
+%Calculating velocity residuals
+u_a_res = (diff(x_a)./diff(time_a))-u_a;
+u_b_res = (diff(x_b)./diff(time_b))-u_b;
+v_a_res = (diff(y_a)./diff(time_a))-v_a;
+v_b_res = (diff(y_b)./diff(time_b))-v_b;
+%Taking velocity standard deviations
+s_u_a = std(u_a_res.^2);
+s_u_b = std(u_b_res.^2);
+s_v_a = std(v_a_res.^2);
+s_v_b = std(v_b_res.^2);
+
+%Setting position functions
+x_a_func = @(t) u_a*t + x_a0;
+x_b_func = @(t) u_b*t + x_b0;
+y_a_func = @(t) v_a*t + y_a0;
+y_b_func = @(t) v_b*t + y_b0;
+%Getting position residuals
+x_a_res = x_a - x_a_func(time_a);
+x_b_res = x_b - x_b_func(time_b);
+y_a_res = y_a - y_a_func(time_a);
+y_b_res = y_b - y_b_func(time_b);
+%Getting position standard deviations
+s_x_a = std(x_a_res.^2);
+s_x_b = std(x_b_res.^2);
+s_y_a = std(y_a_res.^2);
+s_y_b = std(y_b_res.^2);
 
 %error prop for T_ca
 % these are the partial dervis
@@ -118,7 +133,7 @@ dt_ca_dva = ((y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_a-v_b)*(-x_b0+x_a
 dt_ca_dvb = ((-y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_b-v_a)*(-x_b0+x_a0))-((y_b0-y_a0)*(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
 
 %uncertainty of tca 
-s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2 + (dt_ca_dua*));
+s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2 + (dt_ca_dua*s_u_a)^2 + (dt_ca_dub*s_u_b)^2 + (dt_ca_dva*s_v_a)^2 + (dt_ca_dvb*s_v_b)^2);
 
 
 %Error prop of dmin 
@@ -140,10 +155,10 @@ fprintf('D_min: %.2f +/- %.2f Km\n', D_min, s_D_min);
 % use D_min thresholds
 
 %im going to use a if statments for warning 
-if D_min < 1.8 
+if (D_min-s_D_min) < 1.8 
     warning_code = 'Red - Action must be taken';
-elseif D_min < 28.2 
-    warning_code = 'Yello - Plans are devloped';
+elseif (D_min-s_D_min) < 28.2 
+    warning_code = 'Yellow - Plans are devloped';
 else 
     warning_code = 'Green - All clear';
 end
@@ -151,7 +166,7 @@ end
 
 %displaying 
 fprintf('T_ca: %.2f second\n', T_ca);
-fprintf('D_min: %.2f Km\n', D_min);
+fprintf('D_min: %.2f Km\n', (D_min-s_D_min));
 fprintf( 'warning code: %s\n', warning_code);
 
 %% Plotting 
@@ -161,17 +176,17 @@ fprintf( 'warning code: %s\n', warning_code);
 figure; 
 hold on; 
 plot(x_a, y_a,'-o','DisplayName','ISS A tajectory');
-plot(x_b, y_b,'-ok','DisplayName','ISS B trajectory');
+plot(x_b, y_b,'-ok','DisplayName','Satellite trajectory');
 plot([x_a0,x_a_Tca], [y_a0, y_a_Tca], '--', 'DisplayName','ISS A Path');
-plot([x_b0,x_b_Tca], [y_b0, y_b_Tca], '--', 'DisplayName','ISS B Path');
+plot([x_b0,x_b_Tca], [y_b0, y_b_Tca], '--', 'DisplayName','Satellite Path');
 plot(x_a_Tca, y_a_Tca,'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Approach');
-plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','ISS B at closest Approach');
+plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','Satellite at closest Approach');
 grid on; 
 
 
 xlabel('X Position (km)');
 ylabel('Y Position (km)');
-title('Trajectory of ISS A and ISS B');
+title('Trajectory of ISS A and Satellite');
 legend('Location','best');
 hold off; 
 
