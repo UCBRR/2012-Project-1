@@ -14,26 +14,14 @@ close all;
 %% Load data
 
 % this is going to load with the names 
-% here im using variblenamerule and setting it to preserve 
-%this makes it read colum headers i think
+% here im using variblenamerule and setting it to preserve
+% We know this isn't necessary but the warning is annoying
 data_ISS_A = readtable('Data_ISS_A.csv', 'VariableNamingRule','preserve');
 data_ISS_B = readtable('Data_ISS_B.csv','VariableNamingRule','preserve');
 
-%{
-RR - Preserving variable names makes the program give the variables names
- it may not be able to read, then below you set the variable names to
- something both the program and we can read. The original var names
- would've been fine; warnings are not errors and do not have to be dealt
- with, but I do like these ones more.
-%}
-
-%i think this giving varible names 
+%Setting giving varible names 
 data_ISS_A.Properties.VariableNames = {'Time_s','X_km', 'Y_km'};
 data_ISS_B.Properties.VariableNames = {'Time_s','X_km', 'Y_km'};
-
-%adjust?? 
-%im not sure if this is right 
-%RR - looks fine to me
 
 %this is taking the columns into sperate varibles 
 time_a = data_ISS_A.Time_s;
@@ -50,7 +38,6 @@ y_b = data_ISS_B.Y_km;
 
 %linear model for x and y over time so we can get the velocity for both 
 %lin fit for A
-%RR - This makes sense actually
 c_x_a = polyfit(time_a, x_a, 1);
 c_y_a = polyfit(time_a, y_a, 1);
 u_a = c_x_a(1); 
@@ -69,9 +56,7 @@ y_b0 = c_y_b(2);
 %% time of the closest approach 
 % this is using the formula that was given to cal time when they are close 
 
-% this will be getting the numerator and demoninator first 
-% does this n need to be negative
-% RR - I can't see a reason n should be negative; why do you ask?
+% this will be getting the numerator and demoninator first
 n = -((x_b0-x_a0) * (u_b-u_a) + (y_b0-y_a0) * (v_b- v_a));
 d = (u_b-u_a)^2 + (v_b- v_a)^2; 
 T_ca = n / d; 
@@ -118,11 +103,8 @@ s_x_b = std(x_b_res);
 s_y_a = std(y_a_res);
 s_y_b = std(y_b_res);
 
-%error prop for T_ca
-% these are the partial dervis
-%RR - there are 4 partial derivatives here and we need 8; I believe the
-%ones missing are u_B, u_A, v_B, and v_A
-%I'll start looking into that when I wake up
+%% Error propagation for T_ca
+%Partial derivatives
 dt_ca_dxa0 = -(u_b-u_a)/d;
 dt_ca_dya0 = -(v_b-v_a)/d;
 dt_ca_dxb0 = (u_b-u_a)/d;
@@ -144,7 +126,7 @@ dD_miny = -(y_b_Tca-y_a_Tca)/D_min;
 %this is the uncertiany for dmin 
 s_D_min = sqrt((dD_minx*s_x_a)^2+ (dD_miny*s_y_a)^2 + (dD_minx*s_x_b)^2 + (dD_miny*s_y_b)^2 );
 
-%display the uncertaintie 
+%display the uncertainty
 fprintf('T_ca: %.2f +/- %.2f second\n', T_ca, s_Tca);
 fprintf('D_min: %.2f +/- %.2f Km\n', D_min, s_D_min);
 
@@ -154,7 +136,7 @@ fprintf('D_min: %.2f +/- %.2f Km\n', D_min, s_D_min);
 % determining if we should use prevetive manuvers 
 % use D_min thresholds
 
-%im going to use a if statments for warning 
+% im going to use a if statments for warning 
 if (D_min-s_D_min) < 1.8 
     warning_code = 'Red - Action must be taken';
 elseif (D_min-s_D_min) < 28.2 
@@ -171,8 +153,7 @@ fprintf( 'warning code: %s\n', warning_code);
 
 %% Plotting 
 
-% postiton and trajectories to show closets approach 
-
+%postiton and trajectories to show closest approach 
 figure; 
 hold on; 
 plot(x_a, y_a,'-o','DisplayName','ISS A tajectory');
@@ -183,7 +164,7 @@ plot(x_a_Tca, y_a_Tca,'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Appr
 plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','Satellite at closest Approach');
 grid on; 
 
-
+%Setting labels & tidying
 xlabel('X Position (km)');
 ylabel('Y Position (km)');
 title('Trajectory of ISS A and Satellite');
