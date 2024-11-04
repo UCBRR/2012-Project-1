@@ -97,10 +97,10 @@ u_b_res = (diff(x_b)./diff(time_b))-u_b;
 v_a_res = (diff(y_a)./diff(time_a))-v_a;
 v_b_res = (diff(y_b)./diff(time_b))-v_b;
 %Taking velocity standard deviations
-s_u_a = std(u_a_res.^2);
-s_u_b = std(u_b_res.^2);
-s_v_a = std(v_a_res.^2);
-s_v_b = std(v_b_res.^2);
+s_u_a = std(u_a_res);
+s_u_b = std(u_b_res);
+s_v_a = std(v_a_res);
+s_v_b = std(v_b_res);
 
 %Setting position functions
 x_a_func = @(t) u_a*t + x_a0;
@@ -113,10 +113,10 @@ x_b_res = x_b - x_b_func(time_b);
 y_a_res = y_a - y_a_func(time_a);
 y_b_res = y_b - y_b_func(time_b);
 %Getting position standard deviations
-s_x_a = std(x_a_res.^2);
-s_x_b = std(x_b_res.^2);
-s_y_a = std(y_a_res.^2);
-s_y_b = std(y_b_res.^2);
+s_x_a = std(x_a_res);
+s_x_b = std(x_b_res);
+s_y_a = std(y_a_res);
+s_y_b = std(y_b_res);
 
 %error prop for T_ca
 % these are the partial dervis
