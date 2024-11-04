@@ -93,6 +93,7 @@ D_min = sqrt((x_b_Tca - x_a_Tca)^2 + (y_b_Tca-y_a_Tca)^2);
 %% Error prop 
 
 % define uncertianites 
+%RR - where'd these come from? Are there ones for the velocities?
 s_x_a = 0.1;
 s_y_a = 0.1;
 s_x_b = 0.1;
@@ -107,6 +108,10 @@ dt_ca_dxa0 = -(u_b-u_a)/d;
 dt_ca_dya0 = -(v_b-v_a)/d;
 dt_ca_dxb0 = (u_b-u_a)/d;
 dt_ca_dyb0 = (v_b-v_a)/d;
+dt_ca_dua = ((x_b0-x_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(u_a-u_b)*(-x_b0+x_a0))-((y_b0-y_a0)(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
+dt_ca_dub = ((-x_b0+x_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(u_b-u_a)*(-x_b0+x_a0))-((y_b0-y_a0)(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
+dt_ca_dva = ((y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_a-v_b)*(-x_b0+x_a0))-((y_b0-y_a0)(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
+dt_ca_dvb = ((-y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_b-v_a)*(-x_b0+x_a0))-((y_b0-y_a0)(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
 
 %uncertainty of tca 
 s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2);
