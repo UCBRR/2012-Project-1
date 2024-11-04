@@ -96,8 +96,12 @@ D_min = sqrt((x_b_Tca - x_a_Tca)^2 + (y_b_Tca-y_a_Tca)^2);
 %RR - where'd these come from? Are there ones for the velocities?
 s_x_a = 0.1;
 s_y_a = 0.1;
+s_u_a = 0.1;
+s_v_a = 0.1;
 s_x_b = 0.1;
 s_y_b = 0.1;
+s_u_b = 0.1;
+s_v_b = 0.1;
 
 %error prop for T_ca
 % these are the partial dervis
@@ -114,7 +118,7 @@ dt_ca_dva = ((y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_a-v_b)*(-x_b0+x_a
 dt_ca_dvb = ((-y_b0-y_a0)/((u_b-u_a)^(2)+(v_b-v_a)^(2)))-((2*(v_b-v_a)*(-x_b0+x_a0))-((y_b0-y_a0)*(v_b-v_a)))/((u_b-u_a)^(2)+(v_b-v_a)^(2))^(2);
 
 %uncertainty of tca 
-s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2);
+s_Tca= sqrt((dt_ca_dxa0* s_x_a)^2 + (dt_ca_dya0*s_y_a)^2 + (dt_ca_dxb0*s_x_b)^2 +(dt_ca_dyb0*s_y_b)^2 + (dt_ca_dua*));
 
 
 %Error prop of dmin 
@@ -133,7 +137,7 @@ fprintf('D_min: %.2f +/- %.2f Km\n', D_min, s_D_min);
 %% descion making and warning 
 
 % determining if we should use prevetive manuvers 
-% use D_min thresholds 
+% use D_min thresholds
 
 %im going to use a if statments for warning 
 if D_min < 1.8 
@@ -157,11 +161,11 @@ fprintf( 'warning code: %s\n', warning_code);
 figure; 
 hold on; 
 plot(x_a, y_a,'-o','DisplayName','ISS A tajectory');
-plot(x_b, y_b,'-o','DisplayName','ISS B trajectory');
+plot(x_b, y_b,'-ok','DisplayName','ISS B trajectory');
 plot([x_a0,x_a_Tca], [y_a0, y_a_Tca], '--', 'DisplayName','ISS A Path');
 plot([x_b0,x_b_Tca], [y_b0, y_b_Tca], '--', 'DisplayName','ISS B Path');
-plot(x_a_Tca, y_a_Tca,'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Appraoch');
-plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Appraoch');
+plot(x_a_Tca, y_a_Tca,'ro', 'MarkerSize',8, 'DisplayName','ISS A at closest Approach');
+plot(x_b_Tca, y_b_Tca, 'ro', 'MarkerSize',8, 'DisplayName','ISS B at closest Approach');
 grid on; 
 
 
